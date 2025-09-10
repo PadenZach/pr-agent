@@ -53,10 +53,13 @@ class AITool(Protocol):
             'docs_for_language': get_docs_for_language(self.main_language,
                                                        get_settings().pr_add_docs.docs_style),
         }
+        # Assume a setting like "aitool_prompt", or "MyAiTool" -> myaitool_prompt
+        prompt_setting_attr= f"{self.__class__.__name__.lower()}_prompt"
+
         self.token_handler = TokenHandler(self.git_provider.pr,
                                           self.vars,
-                                          get_settings().pr_add_docs_prompt.system,
-                                          get_settings().pr_add_docs_prompt.user)
+                                          getattr(get_settings(),prompt_setting_attr).system,
+                                          getattr(get_settings(),prompt_setting_attr).user)
     
     async def _prepare_prediction(self, model: str):
         get_logger().info('Getting PR diff...')
